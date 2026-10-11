@@ -1,0 +1,76 @@
+name: pipeline
+
+# One pipeline from pull request to production. The work is done by versioned templates
+# in christianlehnert/pipeline-templates. Approvals are configured on the GitHub
+# environments, not in this file.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pipeline-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  dependency-review:
+    if: github.event_name == 'pull_request'
+    uses: christianlehnert/pipeline-templates/.github/workflows/dependency-review.yml@v1
+    permissions:
+      contents: read
+
+  codeql:
+    uses: christianlehnert/pipeline-templates/.github/workflows/codeql.yml@v1
+    with:
+      language: java-kotlin
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+
+  build:
+    uses: christianlehnert/pipeline-templates/.github/workflows/build-java.yml@v1
+    with:
+      app: hello-java
+      push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    permissions:
+      contents: read
+      packages: write
+
+  deploy-dev:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [build, codeql]
+    uses: christianlehnert/pipeline-templates/.github/workflows/deploy.yml@v1
+    with:
+      app: hello-java
+      environment: dev
+      image: ${{ needs.build.outputs.image }}
+    permissions:
+      contents: read
+      packages: read
+
+  deploy-staging:
+    needs: [build, deploy-dev]
+    uses: christianlehnert/pipeline-templates/.github/workflows/deploy.yml@v1
+    with:
+      app: hello-java
+      environment: staging
+      image: ${{ needs.build.outputs.image }}
+    permissions:
+      contents: read
+      packages: read
+
+  deploy-production:
+    needs: [build, deploy-staging]
+    uses: christianlehnert/pipeline-templates/.github/workflows/deploy.yml@v1
+    with:
+      app: hello-java
+      environment: production
+      image: ${{ needs.build.outputs.image }}
+    permissions:
+      contents: read
+      packages: read

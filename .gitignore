@@ -1,0 +1,15 @@
+target/
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# act: local secrets and variables
+.secrets
+*.secrets
+.env
+.vars
+
+# editors and logs
+*.swp
+*.log
