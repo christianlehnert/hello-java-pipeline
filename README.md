@@ -77,11 +77,18 @@ gh api --method POST "repos/$REPO/environments/production/deployment-branch-poli
 their own deployments. With a team, set it to `true` and add the team as reviewer
 (`"type": "Team"` with the team id).
 
+Enable Dependabot alerts and security updates. The first call also enables the
+dependency graph, which the dependency review job requires:
+
+```bash
+gh api --method PUT "repos/$REPO/vulnerability-alerts"
+gh api --method PUT "repos/$REPO/automated-security-fixes"
+```
+
 Further recommended settings:
 
 1. Settings, Branches: protect `main` and require the checks of the `pipeline` workflow.
-2. Settings, Code security: enable Dependabot alerts and security updates. CodeQL results
-   appear under Security, Code scanning.
+2. CodeQL results appear under Security, Code scanning.
 3. Required reviewers on environments are free for public repositories. Private
    repositories need GitHub Enterprise for this protection rule.
 

@@ -9,6 +9,11 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    # A new major runtime version (for example Java 21 to 25) is a deliberate change,
+    # made together with the build version, not an automatic update.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: github-actions
     directory: /
