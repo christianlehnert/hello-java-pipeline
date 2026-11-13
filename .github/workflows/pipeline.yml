@@ -23,6 +23,11 @@ jobs:
     permissions:
       contents: read
 
+  secret-scan:
+    uses: christianlehnert/pipeline-templates/.github/workflows/secret-scan.yml@v1
+    permissions:
+      contents: read
+
   codeql:
     uses: christianlehnert/pipeline-templates/.github/workflows/codeql.yml@v1
     with:
@@ -43,7 +48,7 @@ jobs:
 
   deploy-dev:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [build, codeql]
+    needs: [build, codeql, secret-scan]
     uses: christianlehnert/pipeline-templates/.github/workflows/deploy.yml@v1
     with:
       app: hello-java
