@@ -17,14 +17,11 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  dependency-review:
-    if: github.event_name == 'pull_request'
-    uses: christianlehnert/pipeline-templates/.github/workflows/dependency-review.yml@v1
-    permissions:
-      contents: read
-
-  secret-scan:
-    uses: christianlehnert/pipeline-templates/.github/workflows/secret-scan.yml@v1
+  security:
+    # the one security pipeline: secrets, customer data, workflow files, IaC, dependencies, image
+    uses: christianlehnert/pipeline-templates/.github/workflows/common-security.yml@624e10e14d8a8541b7dfcf36d7a8256b93590811 # feature/common-security
+    with:
+      dockerfile: Dockerfile
     permissions:
       contents: read
 
@@ -48,7 +45,7 @@ jobs:
 
   deploy-dev:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [build, codeql, secret-scan]
+    needs: [build, codeql, security]
     uses: christianlehnert/pipeline-templates/.github/workflows/deploy.yml@v1
     with:
       app: hello-java

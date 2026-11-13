@@ -1,0 +1,8 @@
+# Same scan as the pipeline, before every commit and every push.
+# Install once: pip install pre-commit && pre-commit install --hook-type pre-commit --hook-type pre-push
+repos:
+  - repo: https://github.com/christianlehnert/pipeline-templates
+    rev: 624e10e14d8a8541b7dfcf36d7a8256b93590811
+    hooks:
+      - id: common-security
+      - id: common-security-push
