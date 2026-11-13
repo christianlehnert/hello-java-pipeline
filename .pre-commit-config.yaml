@@ -1,0 +1,7 @@
+# Checks that run on your computer before every commit.
+# Setup once per clone: pre-commit install
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1   # same gitleaks version as the pipeline
+    hooks:
+      - id: gitleaks
